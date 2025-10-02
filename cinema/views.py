@@ -11,6 +11,7 @@ from rest_framework.permissions import BasePermission
 
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
+from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
 
 from cinema.serializers import (
     GenreSerializer,
@@ -27,25 +28,12 @@ from cinema.serializers import (
 )
 
 
-class IsAdminOrIfAuthenticatedReadOnly(BasePermission):
-    def has_permission(self, request, view):
-        return bool(
-            (
-                request.method in permissions.SAFE_METHODS
-                and request.user
-                and request.user.is_authenticated
-            )
-            or (request.user and request.user.is_staff)
-        )
-
-
 class GenreViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class ActorViewSet(mixins.ListModelMixin,
@@ -53,8 +41,6 @@ class ActorViewSet(mixins.ListModelMixin,
                    viewsets.GenericViewSet):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class CinemaHallViewSet(
@@ -64,8 +50,6 @@ class CinemaHallViewSet(
 ):
     queryset = CinemaHall.objects.all()
     serializer_class = CinemaHallSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class MovieViewSet(mixins.ListModelMixin,
@@ -74,8 +58,6 @@ class MovieViewSet(mixins.ListModelMixin,
                    viewsets.GenericViewSet):
     queryset = Movie.objects.prefetch_related("genres", "actors")
     serializer_class = MovieSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
     def _params_to_ints(qs):
@@ -131,8 +113,6 @@ class MovieSessionViewSet(
         )
     )
     serializer_class = MovieSessionSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         date = self.request.query_params.get("date")
