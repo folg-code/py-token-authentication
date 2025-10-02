@@ -12,6 +12,7 @@ class CreateUserView(CreateAPIView):
     authentication_classes = []
     permission_classes = []
 
+
 class LoginUserView(ObtainAuthToken):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
